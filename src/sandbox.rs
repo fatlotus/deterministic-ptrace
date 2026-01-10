@@ -9,6 +9,7 @@ const X86_64_SYS_OPENAT: u64 = 257;
 const X86_64_SYS_NANOSLEEP: u64 = 35;
 const X86_64_SYS_CLOCK_GETTIME: u64 = 228;
 const X86_64_SYS_CLOCK_NANOSLEEP: u64 = 230;
+const X86_64_SYS_EXECVE: u64 = 59;
 
 pub fn syscall_name(nr: u64) -> &'static str {
     match nr {
@@ -59,6 +60,8 @@ pub fn syscall_name(nr: u64) -> &'static str {
         157 => "prctl",
         318 => "getrandom",
         319 => "memfd_create",
+        435 => "clone3",
+        61 => "wait4",
         _ => "unknown",
     }
 }
@@ -111,6 +114,8 @@ pub fn is_allowed(nr: u64) -> bool {
             | 157
             | 318
             | 319
+            | 435
+            | 61
     )
 }
 
@@ -182,7 +187,8 @@ fn write_child_memory(child: i32, addr: u64, data: &[u8]) {
 }
 
 pub enum SandboxState {
-    NewChild, // TO BE IMPLEMENTED
+    Continue,
+    NewChild(i32),
     Pause(u64, u64),
     Exit(i32),
 }
@@ -213,7 +219,7 @@ impl SandboxedProcess {
                 
                 disable_vdso(child);
 
-                libc::ptrace(libc::PTRACE_SETOPTIONS, child, ptr::null_mut::<c_void>(), libc::PTRACE_O_TRACESYSGOOD as *mut c_void);
+                libc::ptrace(libc::PTRACE_SETOPTIONS, child, ptr::null_mut::<c_void>(), (libc::PTRACE_O_TRACESYSGOOD | libc::PTRACE_O_TRACEFORK | libc::PTRACE_O_TRACECLONE | libc::PTRACE_O_TRACEVFORK) as *mut c_void);
 
                 Ok(SandboxedProcess {
                     child_pid: child,
@@ -227,146 +233,191 @@ impl SandboxedProcess {
         }
     }
 
+    pub fn from_pid(pid: i32) -> Self {
+        SandboxedProcess {
+            child_pid: pid,
+            sim_seconds: 123456789,
+            sim_nanoseconds: 0,
+            is_entry: true, // When we intercept a new child, it shouldn't be in a syscall-stop yet, but next wait might be?
+                            // Actually, PTRACE_EVENT_FORK happens in the PARENT. The CHILD is stopped with SIGSTOP (or similar) from ptrace.
+                            // We need to wait for the child? 
+                            // When PTRACE_EVENT_FORK happens, the new child is created and stopped.
+                            // We don't need to do anything to start it until we want to.
+                            // But its first stop will be?
+                            // Usually PTRACE_EVENT_STOP?
+                            // Or does it start in a syscall exit?
+                            // For fork/clone, the child starts at the return of the syscall?
+                            // No, ptrace says child is stopped with SIGSTOP.
+                            // We should probably treat it as is_entry=true?
+        }
+    }
+
     pub fn wakeup_time(&self) -> (u64, u64) {
         // In a real simulation, this might return the next scheduled event time.
         // For now, let's just return current virtual time.
         (self.sim_seconds, self.sim_nanoseconds)
     }
 
-    pub fn resume(&mut self) -> io::Result<SandboxState> {
+    pub fn pid(&self) -> i32 {
+        self.child_pid
+    }
+
+
+    pub fn handle_event(&mut self, status: c_int) -> io::Result<SandboxState> {
         let child = self.child_pid;
-        let mut status: c_int = 0;
         
-        loop {
+        eprintln!("[debug] Handle event: pid={}, status={:x}, WIFSTOPPED: {}, WSTOPSIG: {:x}, is_entry: {}", child, status, libc::WIFSTOPPED(status), libc::WSTOPSIG(status), self.is_entry);
+
+        if libc::WIFEXITED(status) {
+            return Ok(SandboxState::Exit(libc::WEXITSTATUS(status)));
+        }
+
+        if libc::WIFSIGNALED(status) {
+            return Ok(SandboxState::Exit(-libc::WTERMSIG(status)));
+        }
+
+        if (status >> 16) == (libc::PTRACE_EVENT_FORK as i32) || (status >> 16) == (libc::PTRACE_EVENT_CLONE as i32) || (status >> 16) == (libc::PTRACE_EVENT_VFORK as i32) {
+            let mut new_pid: c_long = 0;
             unsafe {
-                libc::ptrace(libc::PTRACE_SYSCALL, child, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                libc::waitpid(child, &mut status, 0);
-                eprintln!("[debug] Waitpid status: {:x}, WIFSTOPPED: {}, WSTOPSIG: {:x}, is_entry: {}", status, libc::WIFSTOPPED(status), libc::WSTOPSIG(status), self.is_entry);
+                libc::ptrace(libc::PTRACE_GETEVENTMSG, child, ptr::null_mut::<c_void>(), &mut new_pid as *mut c_long);
+            }
+            println!("[container] New child process detected: {}", new_pid);
+            return Ok(SandboxState::NewChild(new_pid as i32));
+        }
 
-                if libc::WIFEXITED(status) {
-                    return Ok(SandboxState::Exit(libc::WEXITSTATUS(status)));
-                }
+        if libc::WIFSTOPPED(status) && libc::WSTOPSIG(status) == (SIGTRAP | 0x80) {
+            if self.is_entry {
+                let mut regs = [0u64; 64];
+                let mut iov = iovec {
+                    iov_base: regs.as_mut_ptr() as *mut c_void,
+                    iov_len: std::mem::size_of_val(&regs),
+                };
 
-                if libc::WIFSIGNALED(status) {
-                    return Ok(SandboxState::Exit(-libc::WTERMSIG(status)));
-                }
+                let res = unsafe {
+                    libc::ptrace(
+                        libc::PTRACE_GETREGSET,
+                        child,
+                        NT_PRSTATUS as *mut c_void,
+                        &mut iov as *mut iovec,
+                    )
+                };
 
-                if libc::WIFSTOPPED(status) && libc::WSTOPSIG(status) == (SIGTRAP | 0x80) {
-                    if self.is_entry {
-                        let mut regs = [0u64; 64];
-                        let mut iov = iovec {
-                            iov_base: regs.as_mut_ptr() as *mut c_void,
-                            iov_len: std::mem::size_of_val(&regs),
-                        };
+                if res == 0 {
+                    let regs_count = iov.iov_len / std::mem::size_of::<u64>();
+                    if regs_count > 15 {
+                        let syscall_nr = regs[15];
+                        let name = syscall_name(syscall_nr);
+                        println!("[container] Syscall: {} ({})", syscall_nr, name);
 
-                        let res = libc::ptrace(
-                            libc::PTRACE_GETREGSET,
-                            child,
-                            NT_PRSTATUS as *mut c_void,
-                            &mut iov as *mut iovec,
-                        );
+                        if !is_allowed(syscall_nr) {
+                            eprintln!("[container] FORBIDDEN syscall: {} ({}). Killing child.", syscall_nr, name);
+                            unsafe {
+                                libc::ptrace(libc::PTRACE_KILL, child, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
+                            }
+                            return Err(io::Error::new(io::ErrorKind::InvalidData, "Forbidden syscall"));
+                        }
 
-                        if res == 0 {
-                            let regs_count = iov.iov_len / std::mem::size_of::<u64>();
-                            if regs_count > 15 {
-                                let syscall_nr = regs[15];
-                                let name = syscall_name(syscall_nr);
-                                println!("[container] Syscall: {} ({})", syscall_nr, name);
+                        if syscall_nr == X86_64_SYS_OPENAT {
+                            let path = read_child_string(child, regs[13], 4096);
+                            println!("[container] openat(dirfd={}, pathname=\"{}\", ...)", regs[14] as i64, path);
+                        }
 
-                                if !is_allowed(syscall_nr) {
-                                    eprintln!("[container] FORBIDDEN syscall: {} ({}). Killing child.", syscall_nr, name);
-                                    libc::ptrace(libc::PTRACE_KILL, child, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                                    return Err(io::Error::new(io::ErrorKind::InvalidData, "Forbidden syscall"));
-                                }
+                        if syscall_nr == X86_64_SYS_WRITE {
+                            let fd = regs[14] as i32;
+                            let addr = regs[13];
+                            let len = regs[12];
 
-                                if syscall_nr == X86_64_SYS_OPENAT {
-                                    let path = read_child_string(child, regs[13], 4096);
-                                    println!("[container] openat(dirfd={}, pathname=\"{}\", ...)", regs[14] as i64, path);
-                                }
-
-                                if syscall_nr == X86_64_SYS_WRITE {
-                                    let fd = regs[14] as i32;
-                                    let addr = regs[13];
-                                    let len = regs[12];
-
-                                    if fd >= 0 && fd <= 2 && len > 0 && len < 1000000 {
-                                        println!("[container] write(fd={}, addr={:x}, len={})", fd, addr, len);
-                                        print_escaped(child, addr, if len > 128 { 128 } else { len });
-                                    }
-                                }
-
-                                if syscall_nr == X86_64_SYS_CLOCK_GETTIME {
-                                    let clk_id = regs[14];
-                                    let timespec_ptr = regs[13];
-                                    println!("[container] clock_gettime(clk_id={}, timespec_ptr={:x})", clk_id, timespec_ptr);
-                                    
-                                    let mut timespec_data = [0u8; 16];
-                                    timespec_data[0..8].copy_from_slice(&self.sim_seconds.to_le_bytes());
-                                    timespec_data[8..16].copy_from_slice(&self.sim_nanoseconds.to_le_bytes());
-                                    
-                                    write_child_memory(child, timespec_ptr, &timespec_data);
-                                    
-                                    // Skip the syscall
-                                    regs[15] = 0xFFFFFFFFFFFFFFFF; 
-                                    let iov = iovec {
-                                        iov_base: regs.as_mut_ptr() as *mut c_void,
-                                        iov_len: std::mem::size_of_val(&regs),
-                                    };
-                                    libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
-                                }
-
-                                if syscall_nr == X86_64_SYS_NANOSLEEP || syscall_nr == X86_64_SYS_CLOCK_NANOSLEEP {
-                                    let (req_ptr, _rem_ptr) = if syscall_nr == X86_64_SYS_NANOSLEEP {
-                                        (regs[14], regs[13])
-                                    } else {
-                                        (regs[12], regs[7])
-                                    };
-                                    
-                                    println!("[container] {}(req_ptr={:x})", name, req_ptr);
-                                    
-                                    let tv_sec = libc::ptrace(libc::PTRACE_PEEKDATA, child, req_ptr as *mut c_void, ptr::null_mut::<c_void>()) as u64;
-                                    let tv_nsec = libc::ptrace(libc::PTRACE_PEEKDATA, child, (req_ptr + 8) as *mut c_void, ptr::null_mut::<c_void>()) as u64;
-                                    
-                                    println!("[container] Requested sleep: {}.{:09}s", tv_sec, tv_nsec);
-                                    
-                                    self.sim_nanoseconds += tv_nsec;
-                                    self.sim_seconds += tv_sec + (self.sim_nanoseconds / 1_000_000_000);
-                                    self.sim_nanoseconds %= 1_000_000_000;
-
-                                    // Skip the syscall
-                                    regs[15] = 0xFFFFFFFFFFFFFFFF;
-                                    let iov = iovec {
-                                        iov_base: regs.as_mut_ptr() as *mut c_void,
-                                        iov_len: std::mem::size_of_val(&regs),
-                                    };
-                                    libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
-
-                                    self.is_entry = !self.is_entry;
-                                    return Ok(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds));
-                                }
+                            if fd >= 0 && fd <= 2 && len > 0 && len < 1000000 {
+                                println!("[container] write(fd={}, addr={:x}, len={})", fd, addr, len);
+                                print_escaped(child, addr, if len > 128 { 128 } else { len });
                             }
                         }
-                        io::stdout().flush()?;
-                    } else {
-                        // On exit from "skipped" syscall, set return value to 0
-                        let mut regs = [0u64; 64];
-                        let mut iov = iovec {
-                            iov_base: regs.as_mut_ptr() as *mut c_void,
-                            iov_len: std::mem::size_of_val(&regs),
-                        };
-                        let res = libc::ptrace(libc::PTRACE_GETREGSET, child, NT_PRSTATUS as *mut c_void, &mut iov as *mut iovec);
-                        if res == 0 && regs[15] == 0xFFFFFFFFFFFFFFFF {
-                            regs[10] = 0; // Success
+
+                        if syscall_nr == X86_64_SYS_CLOCK_GETTIME {
+                            let clk_id = regs[14];
+                            let timespec_ptr = regs[13];
+                            println!("[container] clock_gettime(clk_id={}, timespec_ptr={:x})", clk_id, timespec_ptr);
+                            
+                            let mut timespec_data = [0u8; 16];
+                            timespec_data[0..8].copy_from_slice(&self.sim_seconds.to_le_bytes());
+                            timespec_data[8..16].copy_from_slice(&self.sim_nanoseconds.to_le_bytes());
+                            
+                            write_child_memory(child, timespec_ptr, &timespec_data);
+                            
+                            // Skip the syscall
+                            regs[15] = 0xFFFFFFFFFFFFFFFF; 
                             let iov = iovec {
                                 iov_base: regs.as_mut_ptr() as *mut c_void,
                                 iov_len: std::mem::size_of_val(&regs),
                             };
-                            libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
+                            unsafe {
+                                libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
+                            }
+                        }
+
+                        if syscall_nr == X86_64_SYS_NANOSLEEP || syscall_nr == X86_64_SYS_CLOCK_NANOSLEEP {
+                            let (req_ptr, _rem_ptr) = if syscall_nr == X86_64_SYS_NANOSLEEP {
+                                (regs[14], regs[13])
+                            } else {
+                                (regs[12], regs[7])
+                            };
+                            
+                            println!("[container] {}(req_ptr={:x})", name, req_ptr);
+                            
+                            let tv_sec = unsafe { libc::ptrace(libc::PTRACE_PEEKDATA, child, req_ptr as *mut c_void, ptr::null_mut::<c_void>()) as u64 };
+                            let tv_nsec = unsafe { libc::ptrace(libc::PTRACE_PEEKDATA, child, (req_ptr + 8) as *mut c_void, ptr::null_mut::<c_void>()) as u64 };
+                            
+                            println!("[container] Requested sleep: {}.{:09}s", tv_sec, tv_nsec);
+                            
+                            self.sim_nanoseconds += tv_nsec;
+                            self.sim_seconds += tv_sec + (self.sim_nanoseconds / 1_000_000_000);
+                            self.sim_nanoseconds %= 1_000_000_000;
+
+                            // Skip the syscall
+                            regs[15] = 0xFFFFFFFFFFFFFFFF;
+                            let iov = iovec {
+                                iov_base: regs.as_mut_ptr() as *mut c_void,
+                                iov_len: std::mem::size_of_val(&regs),
+                            };
+                            unsafe {
+                                libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
+                            }
+
+                            self.is_entry = !self.is_entry;
+                            return Ok(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds));
                         }
                     }
-                    self.is_entry = !self.is_entry;
+                }
+                io::stdout().flush()?;
+            } else {
+                // On exit from "skipped" syscall, set return value to 0
+                let mut regs = [0u64; 64];
+                let mut iov = iovec {
+                    iov_base: regs.as_mut_ptr() as *mut c_void,
+                    iov_len: std::mem::size_of_val(&regs),
+                };
+                let res = unsafe { libc::ptrace(libc::PTRACE_GETREGSET, child, NT_PRSTATUS as *mut c_void, &mut iov as *mut iovec) };
+                if res == 0 {
+                    let syscall_nr = regs[15];
+                    if syscall_nr == 0xFFFFFFFFFFFFFFFF {
+                        regs[10] = 0; // Success
+                        let iov = iovec {
+                            iov_base: regs.as_mut_ptr() as *mut c_void,
+                            iov_len: std::mem::size_of_val(&regs),
+                        };
+                        unsafe {
+                            libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
+                        }
+                    } else if syscall_nr == X86_64_SYS_EXECVE && regs[10] == 0 {
+                         // execve succeeded, disable vDSO in the new process image
+                         println!("[container] execve success, disabling vDSO for pid {}", child);
+                         disable_vdso(child);
+                    }
                 }
             }
+            self.is_entry = !self.is_entry;
         }
+
+        Ok(SandboxState::Continue)
     }
 }

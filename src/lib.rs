@@ -30,4 +30,11 @@ mod tests {
         assert!(res.is_ok());
         assert_eq!(res.unwrap(), 0);
     }
+
+    #[test]
+    fn test_recursive_clock() {
+        let res = run_sandbox("./target/debug/recursive_clock_test");
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap(), 0);
+    }
 }

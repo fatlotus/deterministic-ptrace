@@ -4,7 +4,12 @@ fn main() {
     let fixed_time = std::time::UNIX_EPOCH + std::time::Duration::from_secs(123456789);
 
     // Verify that the time is always the same.
-    assert_eq!(SystemTime::now(), fixed_time);
+    let now = SystemTime::now();
+    println!("Child: Time is {:?}", now);
+    if now != fixed_time {
+        println!("Child: ERROR: Time mismatch. Expected {:?}, got {:?}", fixed_time, now);
+    }
+    assert_eq!(now, fixed_time);
 
     // Even if you call it twice.
     assert_eq!(SystemTime::now(), fixed_time);
