@@ -37,4 +37,45 @@ mod tests {
         assert!(res.is_ok());
         assert_eq!(res.unwrap(), 0);
     }
+
+    #[test]
+    fn test_process_cleanup() {
+        use std::process::Command;
+        use std::thread;
+        use std::time::Duration;
+
+        let pid;
+        {
+            let proc = sandbox::SandboxedProcess::new("./target/debug/clock_test").unwrap();
+            pid = proc.pid();
+            // Verify process exists
+            assert_eq!(unsafe { libc::kill(pid, 0) }, 0);
+            
+            // Drop it immediately
+        }
+
+        // Give it a moment to be reaped
+        thread::sleep(Duration::from_millis(100));
+
+        // Verify process no longer exists
+        // kill with 0 returns -1 and sets errno to ESRCH if process doesn't exist
+        let res = unsafe { libc::kill(pid, 0) };
+        assert!(res == -1);
+        assert_eq!(unsafe { *libc::__errno_location() }, libc::ESRCH);
+    }
+
+    #[test]
+    fn test_resume_interface() {
+        let mut proc = sandbox::SandboxedProcess::new("./target/debug/printf_success").unwrap();
+        match proc.resume().unwrap() {
+            sandbox::SandboxState::Exit(0) => (),
+            state => panic!("Expected Exit(0), got {:?}", state),
+        }
+
+        let mut proc = sandbox::SandboxedProcess::new("./target/debug/mkdir_fail").unwrap();
+        // Since we are mocking mkdir_fail, we expect it to try a forbidden syscall
+        // and handle_event will return an error (as it does now for forbidden syscalls)
+        let res = proc.resume();
+        assert!(res.is_err());
+    }
 }

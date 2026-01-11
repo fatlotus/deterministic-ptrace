@@ -186,13 +186,14 @@ fn write_child_memory(child: i32, addr: u64, data: &[u8]) {
     }
 }
 
+#[derive(Debug)]
 pub enum SandboxState {
-    Continue,
-    NewChild(i32),
+    NewChild(SandboxedProcess),
     Pause(u64, u64),
     Exit(i32),
 }
 
+#[derive(Debug)]
 pub struct SandboxedProcess {
     child_pid: i32,
     sim_seconds: u64,
@@ -207,15 +208,15 @@ impl SandboxedProcess {
             if child == 0 {
                 libc::ptrace(libc::PTRACE_TRACEME, 0, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
                 let c_target = CString::new(command.as_bytes()).unwrap();
-                // Split command into args if needed, but for now simple execvp
-                 // Actually execvp takes array of args. Original code just passed target as both program and arg0
                 let args_ptrs = [c_target.as_ptr(), ptr::null()];
                 libc::execvp(c_target.as_ptr(), args_ptrs.as_ptr());
                 libc::perror(b"execvp\0".as_ptr() as *const i8);
                 libc::exit(1);
             } else if child > 0 {
                 let mut status: c_int = 0;
-                libc::waitpid(child, &mut status, 0);
+                if libc::waitpid(child, &mut status, 0) == -1 {
+                    return Err(io::Error::last_os_error());
+                }
                 
                 disable_vdso(child);
 
@@ -238,17 +239,26 @@ impl SandboxedProcess {
             child_pid: pid,
             sim_seconds: 123456789,
             sim_nanoseconds: 0,
-            is_entry: true, // When we intercept a new child, it shouldn't be in a syscall-stop yet, but next wait might be?
-                            // Actually, PTRACE_EVENT_FORK happens in the PARENT. The CHILD is stopped with SIGSTOP (or similar) from ptrace.
-                            // We need to wait for the child? 
-                            // When PTRACE_EVENT_FORK happens, the new child is created and stopped.
-                            // We don't need to do anything to start it until we want to.
-                            // But its first stop will be?
-                            // Usually PTRACE_EVENT_STOP?
-                            // Or does it start in a syscall exit?
-                            // For fork/clone, the child starts at the return of the syscall?
-                            // No, ptrace says child is stopped with SIGSTOP.
-                            // We should probably treat it as is_entry=true?
+            is_entry: true,
+        }
+    }
+
+    pub fn resume(&mut self) -> io::Result<SandboxState> {
+        loop {
+            unsafe {
+                libc::ptrace(libc::PTRACE_SYSCALL, self.child_pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
+            }
+
+            let mut status: c_int = 0;
+            let pid = unsafe { libc::waitpid(self.child_pid, &mut status, 0) };
+            if pid == -1 {
+                return Err(io::Error::last_os_error());
+            }
+
+            match self.handle_event(status)? {
+                Some(state) => return Ok(state),
+                None => continue,
+            }
         }
     }
 
@@ -263,17 +273,17 @@ impl SandboxedProcess {
     }
 
 
-    pub fn handle_event(&mut self, status: c_int) -> io::Result<SandboxState> {
+    pub fn handle_event(&mut self, status: c_int) -> io::Result<Option<SandboxState>> {
         let child = self.child_pid;
         
         eprintln!("[debug] Handle event: pid={}, status={:x}, WIFSTOPPED: {}, WSTOPSIG: {:x}, is_entry: {}", child, status, libc::WIFSTOPPED(status), libc::WSTOPSIG(status), self.is_entry);
 
         if libc::WIFEXITED(status) {
-            return Ok(SandboxState::Exit(libc::WEXITSTATUS(status)));
+            return Ok(Some(SandboxState::Exit(libc::WEXITSTATUS(status))));
         }
 
         if libc::WIFSIGNALED(status) {
-            return Ok(SandboxState::Exit(-libc::WTERMSIG(status)));
+            return Ok(Some(SandboxState::Exit(-libc::WTERMSIG(status))));
         }
 
         if (status >> 16) == (libc::PTRACE_EVENT_FORK as i32) || (status >> 16) == (libc::PTRACE_EVENT_CLONE as i32) || (status >> 16) == (libc::PTRACE_EVENT_VFORK as i32) {
@@ -282,7 +292,7 @@ impl SandboxedProcess {
                 libc::ptrace(libc::PTRACE_GETEVENTMSG, child, ptr::null_mut::<c_void>(), &mut new_pid as *mut c_long);
             }
             println!("[container] New child process detected: {}", new_pid);
-            return Ok(SandboxState::NewChild(new_pid as i32));
+            return Ok(Some(SandboxState::NewChild(SandboxedProcess::from_pid(new_pid as i32))));
         }
 
         if libc::WIFSTOPPED(status) && libc::WSTOPSIG(status) == (SIGTRAP | 0x80) {
@@ -384,7 +394,7 @@ impl SandboxedProcess {
                             }
 
                             self.is_entry = !self.is_entry;
-                            return Ok(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds));
+                            return Ok(Some(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds)));
                         }
                     }
                 }
@@ -418,6 +428,20 @@ impl SandboxedProcess {
             self.is_entry = !self.is_entry;
         }
 
-        Ok(SandboxState::Continue)
+        Ok(None)
+    }
+}
+
+impl Drop for SandboxedProcess {
+    fn drop(&mut self) {
+        unsafe {
+            let pid = self.child_pid;
+            // Check if process still exists
+            if libc::kill(pid, 0) == 0 {
+                libc::ptrace(libc::PTRACE_KILL, pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
+                let mut status = 0;
+                libc::waitpid(pid, &mut status, 0);
+            }
+        }
     }
 }

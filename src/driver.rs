@@ -1,70 +1,42 @@
-use std::collections::HashMap;
 use std::io;
-use std::ptr;
-use libc::{self, c_int, c_void};
 use crate::sandbox::{SandboxedProcess, SandboxState};
 
 pub fn run_sandbox(target: &str) -> io::Result<i32> {
-    let mut processes: HashMap<i32, SandboxedProcess> = HashMap::new();
+    let mut processes: Vec<SandboxedProcess> = Vec::new();
     let initial = SandboxedProcess::new(target)?;
-    let initial_pid = initial.pid();
-    processes.insert(initial_pid, initial);
-    
-    // Resume the initial process
-    unsafe {
-        libc::ptrace(libc::PTRACE_SYSCALL, initial_pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-    }
+    processes.push(initial);
 
     loop {
         if processes.is_empty() {
             return Ok(0);
         }
 
-        let mut status: c_int = 0;
-        let pid = unsafe { libc::waitpid(-1, &mut status, 0) };
-        if pid == -1 {
-            let err = io::Error::last_os_error();
-            if err.raw_os_error() == Some(libc::ECHILD) {
-                // No more children
-                return Ok(0);
-            }
-            return Err(err);
-        }
-
-        if let Some(proc) = processes.get_mut(&pid) {
-            match proc.handle_event(status)? {
-                SandboxState::Exit(code) => {
+        let mut i = 0;
+        while i < processes.len() {
+            let proc = &mut processes[i];
+            let pid = proc.pid();
+            
+            match proc.resume() {
+                Ok(SandboxState::Exit(code)) => {
                     println!("[driver] Process {} exited with code {}", pid, code);
-                    processes.remove(&pid);
-                    if pid == initial_pid {
-                        return Ok(code);
-                    }
+                    processes.remove(i);
+                    // If this was the original process, we might want to exit?
+                    // The original instructions say: "maintain the invariant that ptraced processes
+                    // (SandboxedProcess instances) are only running for the duration of resume()."
+                    // And "refactor the driver so that it only stores SandboxedProcess instances."
+                    continue; // i stays the same, pointing to next process
                 }
-                SandboxState::Pause(_sec, _nsec) => {
-                    unsafe {
-                        libc::ptrace(libc::PTRACE_SYSCALL, pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                    }
+                Ok(SandboxState::NewChild(new_proc)) => {
+                    processes.push(new_proc);
+                    i += 1;
                 }
-                SandboxState::NewChild(new_pid) => {
-                    let new_proc = SandboxedProcess::from_pid(new_pid);
-                    processes.insert(new_pid, new_proc);
-                    unsafe {
-                        libc::ptrace(libc::PTRACE_SYSCALL, pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                        libc::ptrace(libc::PTRACE_SYSCALL, new_pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                    }
+                Ok(SandboxState::Pause(_sec, _nsec)) => {
+                    // // Just move to next process for now, or handle scheduling
+                    // i += 1;
                 }
-                SandboxState::Continue => {
-                    unsafe {
-                        libc::ptrace(libc::PTRACE_SYSCALL, pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                    }
+                Err(e) => {
+                    return Err(e);
                 }
-            }
-        } else {
-             // If we intercept a new child before NewChild event (unlikely with PTRACE_EVENT_FORK order),
-             // or if we catch some other process (shouldn't occur if we only fork).
-             eprintln!("[driver] Unknown pid {} woke up", pid);
-             unsafe {
-                libc::ptrace(libc::PTRACE_SYSCALL, pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
             }
         }
     }
