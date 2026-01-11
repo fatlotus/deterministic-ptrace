@@ -262,16 +262,9 @@ impl SandboxedProcess {
         }
     }
 
-    pub fn wakeup_time(&self) -> (u64, u64) {
-        // In a real simulation, this might return the next scheduled event time.
-        // For now, let's just return current virtual time.
-        (self.sim_seconds, self.sim_nanoseconds)
-    }
-
     pub fn pid(&self) -> i32 {
         self.child_pid
     }
-
 
     pub fn handle_event(&mut self, status: c_int) -> io::Result<Option<SandboxState>> {
         let child = self.child_pid;
