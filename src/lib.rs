@@ -40,7 +40,6 @@ mod tests {
 
     #[test]
     fn test_process_cleanup() {
-        use std::process::Command;
         use std::thread;
         use std::time::Duration;
 

@@ -1,43 +1,35 @@
 use std::io;
 use crate::sandbox::{SandboxedProcess, SandboxState};
+use std::collections::VecDeque;
 
 pub fn run_sandbox(target: &str) -> io::Result<i32> {
-    let mut processes: Vec<SandboxedProcess> = Vec::new();
+    let mut processes: VecDeque<SandboxedProcess> = VecDeque::new();
     let initial = SandboxedProcess::new(target)?;
-    processes.push(initial);
+    processes.push_back(initial);
 
-    loop {
-        if processes.is_empty() {
-            return Ok(0);
-        }
+    while !processes.is_empty() {
+        let mut next = processes.pop_front().unwrap();
+        let pid = next.pid();
+        println!("[driver] Process {} is running", pid);
 
-        let mut i = 0;
-        while i < processes.len() {
-            let proc = &mut processes[i];
-            let pid = proc.pid();
-            
-            match proc.resume() {
-                Ok(SandboxState::Exit(code)) => {
-                    println!("[driver] Process {} exited with code {}", pid, code);
-                    processes.remove(i);
-                    // If this was the original process, we might want to exit?
-                    // The original instructions say: "maintain the invariant that ptraced processes
-                    // (SandboxedProcess instances) are only running for the duration of resume()."
-                    // And "refactor the driver so that it only stores SandboxedProcess instances."
-                    continue; // i stays the same, pointing to next process
+        match next.resume() {
+            Ok(SandboxState::Exit(code)) => {
+                println!("[driver] Process {} exited with code {}", pid, code);
+                if code != 0 {
+                    return Ok(code);
                 }
-                Ok(SandboxState::NewChild(new_proc)) => {
-                    processes.push(new_proc);
-                    i += 1;
-                }
-                Ok(SandboxState::Pause(_sec, _nsec)) => {
-                    // // Just move to next process for now, or handle scheduling
-                    // i += 1;
-                }
-                Err(e) => {
-                    return Err(e);
-                }
+            }
+            Ok(SandboxState::NewChild(new_proc)) => {
+                processes.push_back(new_proc);
+                processes.push_back(next);
+            }
+            Ok(SandboxState::Pause(_sec, _nsec)) => {
+                processes.push_back(next);
+            }
+            Err(e) => {
+                return Err(e);
             }
         }
     }
+    Ok(0)
 }
