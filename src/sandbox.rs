@@ -62,6 +62,7 @@ pub fn syscall_name(nr: u64) -> &'static str {
         319 => "memfd_create",
         435 => "clone3",
         61 => "wait4",
+        332 => "statx",
         _ => "unknown",
     }
 }
@@ -116,6 +117,7 @@ pub fn is_allowed(nr: u64) -> bool {
             | 319
             | 435
             | 61
+            | 332
     )
 }
 
