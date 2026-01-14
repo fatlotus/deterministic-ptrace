@@ -190,6 +190,7 @@ fn write_child_memory(child: i32, addr: u64, data: &[u8]) {
 pub enum SandboxState {
     NewChild(SandboxedProcess),
     Pause(u64, u64),
+    SchedYield,
     Exit(i32),
 }
 
@@ -199,6 +200,7 @@ pub struct SandboxedProcess {
     sim_seconds: u64,
     sim_nanoseconds: u64,
     is_entry: bool,
+    needs_resume: bool,
 }
 
 impl SandboxedProcess {
@@ -227,6 +229,7 @@ impl SandboxedProcess {
                     sim_seconds: 123456789,
                     sim_nanoseconds: 0,
                     is_entry: true,
+                    needs_resume: true,
                 })
             } else {
                 Err(io::Error::last_os_error())
@@ -240,20 +243,31 @@ impl SandboxedProcess {
             sim_seconds: 123456789,
             sim_nanoseconds: 0,
             is_entry: true,
+            needs_resume: true,
         }
     }
 
     pub fn resume(&mut self) -> io::Result<SandboxState> {
         loop {
-            unsafe {
-                libc::ptrace(libc::PTRACE_SYSCALL, self.child_pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
+            if self.needs_resume {
+                unsafe {
+                    if libc::ptrace(libc::PTRACE_SYSCALL, self.child_pid, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>()) == -1 {
+                        return Err(io::Error::last_os_error());
+                    }
+                }
+                self.needs_resume = false;
             }
 
             let mut status: c_int = 0;
-            let pid = unsafe { libc::waitpid(self.child_pid, &mut status, 0) };
+            let pid = unsafe { libc::waitpid(self.child_pid, &mut status, libc::WNOHANG) };
             if pid == -1 {
                 return Err(io::Error::last_os_error());
             }
+            if pid == 0 {
+                return Ok(SandboxState::SchedYield);
+            }
+
+            self.needs_resume = true;
 
             match self.handle_event(status)? {
                 Some(state) => return Ok(state),
@@ -388,6 +402,12 @@ impl SandboxedProcess {
 
                             self.is_entry = !self.is_entry;
                             return Ok(Some(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds)));
+                        }
+
+                        if syscall_nr == 61 { // wait4
+                            println!("[container] wait4 interception, yielding");
+                            self.is_entry = !self.is_entry;
+                            return Ok(Some(SandboxState::SchedYield));
                         }
                     }
                 }

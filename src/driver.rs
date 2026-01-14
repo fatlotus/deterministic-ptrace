@@ -26,6 +26,9 @@ pub fn run_sandbox(target: &str) -> io::Result<i32> {
             Ok(SandboxState::Pause(_sec, _nsec)) => {
                 processes.push_back(next);
             }
+            Ok(SandboxState::SchedYield) => {
+                processes.push_back(next);
+            }
             Err(e) => {
                 return Err(e);
             }

@@ -16,5 +16,9 @@ fn main() {
         println!("Parent: Child failed with status: {:?}", status);
     }
     assert!(status.success());
-    println!("Parent: Child finished successfully");
+    println!("Parent: Child finished successfffffully");
+
+    println!("Parent: Checking time...");
+    // The command took two (virtual) seconds to run.
+    assert_eq!(SystemTime::now(), fixed_time + std::time::Duration::from_secs(2));
 }
