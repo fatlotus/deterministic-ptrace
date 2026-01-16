@@ -1,7 +1,0 @@
-[package]
-name = "test-binaries"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-# No dependencies for now, but binaries use std

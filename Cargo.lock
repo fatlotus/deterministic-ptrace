@@ -37,9 +37,4 @@ version = "0.1.0"
 dependencies = [
  "libc",
  "nix",
- "test-binaries",
 ]
-
-[[package]]
-name = "test-binaries"
-version = "0.1.0"
