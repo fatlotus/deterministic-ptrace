@@ -4,27 +4,34 @@ use std::time::Duration;
 
 #[test]
 fn test_happy_case() {
-    let res = run_sandbox(env!("CARGO_BIN_EXE_printf_success"));
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_printf_success")]);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_sad_case() {
-    let res = run_sandbox(env!("CARGO_BIN_EXE_mkdir_fail"));
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_mkdir_fail")]);
     assert!(!res.is_ok());
 }
 
 #[test]
 fn test_clock_redirection() {
-    let res = run_sandbox(env!("CARGO_BIN_EXE_clock_test"));
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_clock_test")]);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_recursive_clock() {
-    let res = run_sandbox(env!("CARGO_BIN_EXE_recursive_clock_test"));
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")]);
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 0);
+}
+
+#[test]
+fn test_python_hello_world() {
+    let res = run_sandbox(&["/usr/bin/python3", "-c", "print('hello world')"]);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
@@ -33,7 +40,7 @@ fn test_recursive_clock() {
 fn test_process_cleanup() {
     let pid;
     {
-        let proc = sandbox::SandboxedProcess::new(env!("CARGO_BIN_EXE_clock_test")).unwrap();
+        let proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_clock_test")]).unwrap();
         pid = proc.pid();
         // Verify process exists
         assert_eq!(unsafe { libc::kill(pid, 0) }, 0);
@@ -53,7 +60,7 @@ fn test_process_cleanup() {
 
 #[test]
 fn test_resume_interface() {
-    let mut proc = sandbox::SandboxedProcess::new(env!("CARGO_BIN_EXE_printf_success")).unwrap();
+    let mut proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_printf_success")]).unwrap();
     loop {
         match proc.resume(std::time::UNIX_EPOCH) {
             Ok(sandbox::SandboxState::SchedYield) => continue,
@@ -63,7 +70,7 @@ fn test_resume_interface() {
         }
     }
 
-    let mut proc = sandbox::SandboxedProcess::new(env!("CARGO_BIN_EXE_mkdir_fail")).unwrap();
+    let mut proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_mkdir_fail")]).unwrap();
     loop {
         match proc.resume(std::time::UNIX_EPOCH) {
             Ok(sandbox::SandboxState::SchedYield) => continue,

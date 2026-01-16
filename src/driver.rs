@@ -29,12 +29,12 @@ impl Ord for SleepingProcess {
     }
 }
 
-pub fn run_sandbox(target: &str) -> io::Result<i32> {
+pub fn run_sandbox(args: &[&str]) -> io::Result<i32> {
     let mut runnable: VecDeque<SandboxedProcess> = VecDeque::new();
     let mut sleeping: BinaryHeap<SleepingProcess> = BinaryHeap::new();
     let mut waiting: Vec<SandboxedProcess> = Vec::new();
 
-    let initial = SandboxedProcess::new(target)?;
+    let initial = SandboxedProcess::new(args)?;
     runnable.push_back(initial);
 
     let mut now = std::time::UNIX_EPOCH + std::time::Duration::from_secs(123456789);

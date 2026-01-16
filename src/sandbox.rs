@@ -21,6 +21,7 @@ pub fn syscall_name(nr: u64) -> &'static str {
         137 => "fstatfs",
         269 => "faccessat",
         257 => "openat",
+        2 => "open",
         3 => "close",
         8 => "lseek",
         0 => "read",
@@ -64,6 +65,39 @@ pub fn syscall_name(nr: u64) -> &'static str {
         435 => "clone3",
         61 => "wait4",
         332 => "statx",
+        201 => "time",
+        41 => "socket",
+        42 => "connect",
+        43 => "accept",
+        54 => "setsockopt",
+        55 => "getsockopt",
+        110 => "getppid",
+        102 => "getuid",
+        104 => "getgid",
+        107 => "geteuid",
+        108 => "getegid",
+        105 => "setuid",
+        106 => "setgid",
+        217 => "getdents64",
+        78 => "getdents",
+        32 => "dup",
+        33 => "dup2",
+        292 => "dup3",
+        22 => "pipe",
+        293 => "pipe2",
+        77 => "ftruncate",
+        92 => "chown",
+        93 => "fchown",
+        90 => "chmod",
+        91 => "fchmod",
+        80 => "chdir",
+        81 => "fchdir",
+        85 => "creat",
+        86 => "link",
+        265 => "linkat",
+        88 => "symlink",
+        266 => "symlinkat",
+        89 => "readlink",
         _ => "unknown",
     }
 }
@@ -76,6 +110,7 @@ pub fn is_allowed(nr: u64) -> bool {
             | 137
             | 269
             | 257
+            | 2
             | 3
             | 8
             | 0
@@ -119,6 +154,8 @@ pub fn is_allowed(nr: u64) -> bool {
             | 435
             | 61
             | 332
+            | 201
+            | 41 | 42 | 43 | 54 | 55 | 110 | 102 | 104 | 107 | 108 | 105 | 106 | 217 | 78 | 32 | 33 | 292 | 22 | 293 | 77 | 92 | 93 | 90 | 91 | 80 | 81 | 85 | 86 | 265 | 88 | 266 | 89
     )
 }
 
@@ -206,14 +243,22 @@ pub struct SandboxedProcess {
 }
 
 impl SandboxedProcess {
-    pub fn new(command: &str) -> io::Result<Self> {
+    pub fn new(args: &[&str]) -> io::Result<Self> {
         unsafe {
             let child = libc::fork();
             if child == 0 {
                 libc::ptrace(libc::PTRACE_TRACEME, 0, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
-                let c_target = CString::new(command.as_bytes()).unwrap();
-                let args_ptrs = [c_target.as_ptr(), ptr::null()];
-                libc::execvp(c_target.as_ptr(), args_ptrs.as_ptr());
+                
+                let c_args: Vec<CString> = args.iter()
+                    .map(|s| CString::new(*s).unwrap())
+                    .collect();
+                
+                let mut arg_ptrs: Vec<*const i8> = c_args.iter()
+                    .map(|s| s.as_ptr())
+                    .collect();
+                arg_ptrs.push(ptr::null());
+
+                libc::execvp(arg_ptrs[0], arg_ptrs.as_ptr());
                 libc::perror(b"execvp\0".as_ptr() as *const i8);
                 libc::exit(1);
             } else if child > 0 {
