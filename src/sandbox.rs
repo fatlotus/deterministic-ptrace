@@ -3,6 +3,7 @@ use std::ffi::CString;
 use std::io::{self, Write};
 use std::ptr;
 use crate::vdso::disable_vdso;
+use std::time::{SystemTime, Duration, UNIX_EPOCH};
 
 const X86_64_SYS_WRITE: u64 = 1;
 const X86_64_SYS_OPENAT: u64 = 257;
@@ -191,7 +192,7 @@ fn write_child_memory(child: i32, addr: u64, data: &[u8]) {
 #[derive(Debug)]
 pub enum SandboxState {
     NewChild(SandboxedProcess),
-    Pause(u64, u64),
+    Pause(SystemTime),
     SchedYield,
     Exit(i32),
 }
@@ -199,8 +200,6 @@ pub enum SandboxState {
 #[derive(Debug)]
 pub struct SandboxedProcess {
     child_pid: i32,
-    sim_seconds: u64,
-    sim_nanoseconds: u64,
     is_entry: bool,
     needs_resume: bool,
 }
@@ -228,8 +227,6 @@ impl SandboxedProcess {
 
                 Ok(SandboxedProcess {
                     child_pid: child,
-                    sim_seconds: 123456789,
-                    sim_nanoseconds: 0,
                     is_entry: true,
                     needs_resume: true,
                 })
@@ -242,14 +239,12 @@ impl SandboxedProcess {
     pub fn from_pid(pid: i32) -> Self {
         SandboxedProcess {
             child_pid: pid,
-            sim_seconds: 123456789,
-            sim_nanoseconds: 0,
             is_entry: true,
             needs_resume: true,
         }
     }
 
-    pub fn resume(&mut self) -> io::Result<SandboxState> {
+    pub fn resume(&mut self, when: SystemTime) -> io::Result<SandboxState> {
         loop {
             if self.needs_resume {
                 unsafe {
@@ -271,7 +266,7 @@ impl SandboxedProcess {
 
             self.needs_resume = true;
 
-            match self.handle_event(status)? {
+            match self.handle_event(status, when)? {
                 Some(state) => return Ok(state),
                 None => continue,
             }
@@ -282,7 +277,7 @@ impl SandboxedProcess {
         self.child_pid
     }
 
-    pub fn handle_event(&mut self, status: c_int) -> io::Result<Option<SandboxState>> {
+    pub fn handle_event(&mut self, status: c_int, now: SystemTime) -> io::Result<Option<SandboxState>> {
         let child = self.child_pid;
         
         eprintln!("[debug] Handle event: pid={}, status={:x}, WIFSTOPPED: {}, WSTOPSIG: {:x}, is_entry: {}", child, status, libc::WIFSTOPPED(status), libc::WSTOPSIG(status), self.is_entry);
@@ -349,6 +344,8 @@ impl SandboxedProcess {
                             if fd >= 0 && fd <= 2 && len > 0 && len < 1000000 {
                                 println!("[container] write(fd={}, addr={:x}, len={})", fd, addr, len);
                                 print_escaped(child, addr, if len > 128 { 128 } else { len });
+                                let s = read_child_string(child, addr, len as usize);
+                                println!("[container] write(fd={}, addr={:x}, len={}) = \"{}\"", fd, addr, len, s);
                             }
                         }
 
@@ -357,9 +354,13 @@ impl SandboxedProcess {
                             let timespec_ptr = regs[13];
                             println!("[container] clock_gettime(clk_id={}, timespec_ptr={:x})", clk_id, timespec_ptr);
                             
+                            let since_epoch = now.duration_since(UNIX_EPOCH).unwrap();
+                            let seconds = since_epoch.as_secs();
+                            let nanoseconds = since_epoch.subsec_nanos() as i64;
+
                             let mut timespec_data = [0u8; 16];
-                            timespec_data[0..8].copy_from_slice(&self.sim_seconds.to_le_bytes());
-                            timespec_data[8..16].copy_from_slice(&self.sim_nanoseconds.to_le_bytes());
+                            timespec_data[0..8].copy_from_slice(&seconds.to_le_bytes());
+                            timespec_data[8..16].copy_from_slice(&nanoseconds.to_le_bytes());
                             
                             write_child_memory(child, timespec_ptr, &timespec_data);
                             
@@ -388,9 +389,7 @@ impl SandboxedProcess {
                             
                             println!("[container] Requested sleep: {}.{:09}s", tv_sec, tv_nsec);
                             
-                            self.sim_nanoseconds += tv_nsec;
-                            self.sim_seconds += tv_sec + (self.sim_nanoseconds / 1_000_000_000);
-                            self.sim_nanoseconds %= 1_000_000_000;
+                            let new_now = now + Duration::from_secs(tv_sec) + Duration::from_nanos(tv_nsec);
 
                             // Skip the syscall
                             regs[15] = 0xFFFFFFFFFFFFFFFF;
@@ -403,7 +402,7 @@ impl SandboxedProcess {
                             }
 
                             self.is_entry = !self.is_entry;
-                            return Ok(Some(SandboxState::Pause(self.sim_seconds, self.sim_nanoseconds)));
+                            return Ok(Some(SandboxState::Pause(new_now)));
                         }
 
                         if syscall_nr == 61 { // wait4

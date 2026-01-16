@@ -67,10 +67,11 @@ mod tests {
     fn test_resume_interface() {
         let mut proc = sandbox::SandboxedProcess::new("./target/debug/printf_success").unwrap();
         loop {
-            match proc.resume().unwrap() {
-                sandbox::SandboxState::SchedYield => continue,
-                sandbox::SandboxState::Exit(0) => break,
-                state => panic!("Expected Exit(0), got {:?}", state),
+            match proc.resume(std::time::UNIX_EPOCH) {
+                Ok(sandbox::SandboxState::SchedYield) => continue,
+                Ok(sandbox::SandboxState::Exit(0)) => break,
+                Ok(state) => panic!("Expected Exit(0), got {:?}", state),
+                Err(e) => panic!("Expected Exit(0), got {:?}", e),
             }
         }
 
@@ -78,7 +79,7 @@ mod tests {
         // Since we are mocking mkdir_fail, we expect it to try a forbidden syscall
         // and handle_event will return an error (as it does now for forbidden syscalls)
         loop {
-            match proc.resume() {
+            match proc.resume(std::time::UNIX_EPOCH) {
                 Ok(sandbox::SandboxState::SchedYield) => continue,
                 Err(_) => break, // Expected error for forbidden syscall
                 Ok(state) => panic!("Expected error, got {:?}", state),

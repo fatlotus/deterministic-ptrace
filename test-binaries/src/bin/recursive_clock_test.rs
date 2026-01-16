@@ -16,7 +16,7 @@ fn main() {
         println!("Parent: Child failed with status: {:?}", status);
     }
     assert!(status.success());
-    println!("Parent: Child finished successfffffully");
+    println!("Parent: Child finished successfully");
 
     println!("Parent: Checking time...");
     // The command took two (virtual) seconds to run.
