@@ -194,6 +194,7 @@ pub enum SandboxState {
     NewChild(SandboxedProcess),
     Pause(SystemTime),
     SchedYield,
+    WaitForSubprocess,
     Exit(i32),
 }
 
@@ -408,7 +409,7 @@ impl SandboxedProcess {
                         if syscall_nr == 61 { // wait4
                             println!("[container] wait4 interception, yielding");
                             self.is_entry = !self.is_entry;
-                            return Ok(Some(SandboxState::SchedYield));
+                            return Ok(Some(SandboxState::WaitForSubprocess));
                         }
                     }
                 }
