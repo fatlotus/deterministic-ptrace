@@ -1,0 +1,833 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running tests/integration_tests.rs (target/debug/deps/integration_tests-3a17c7040d11ff9b)
+
+running 1 test
+[vdso] sp=fffff545f160, argc=1
+[vdso] Searching auxv at fffff545f308
+[vdso] Found and zeroed AT_SYSINFO_EHDR (33) value at fffff545f310, original value=ffffb9cc8000
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[driver] Process Ok(SchedYield) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 is running
+[container] Bytes: \x43\x68\x69\x6c\x64\x3a\x20\x53\x65\x65\x64\x20\x69\x73\x20\x35\x30\x36\x30\x39\x37\x35\x32\x32\x39\x31\x34\x32\x33\x30\x35\x32\x38\x0aChild: Seed is 506097522914230528
+[container] Bytes: \x43\x68\x69\x6c\x64\x3a\x20\x72\x31\x20\x3d\x20\x31\x37\x32\x35\x35\x36\x34\x35\x39\x34\x31\x35\x39\x35\x31\x38\x38\x32\x36\x37\x0aChild: r1 = 17255645941595188267
+[container] Bytes: \x43\x68\x69\x6c\x64\x3a\x20\x72\x32\x20\x3d\x20\x34\x39\x34\x31\x32\x33\x30\x34\x30\x37\x38\x35\x31\x39\x31\x37\x35\x37\x38\x0aChild: r2 = 4941230407851917578
+[container] Bytes: \x43\x68\x69\x6c\x64\x3a\x20\x72\x33\x20\x3d\x20\x31\x33\x30\x39\x37\x32\x35\x32\x32\x32\x31\x36\x32\x35\x34\x30\x34\x30\x39\x36\x0aChild: r3 = 13097252221625404096
+[container] Bytes: \x43\x68\x69\x6c\x64\x3a\x20\x41\x6c\x6c\x20\x61\x73\x73\x65\x72\x74\x69\x6f\x6e\x73\x20\x70\x61\x73\x73\x65\x64\x21\x0aChild: All assertions passed!
+[driver] Process Ok(Exit(0)) resumed (runnable=0, sleeping=0, waiting=0)
+[driver] Process 17908 exited with code 0
+test test_random_determinism ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.00s
+

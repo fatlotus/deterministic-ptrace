@@ -23,6 +23,13 @@ fn test_clock_redirection() {
 }
 
 #[test]
+fn test_random_determinism() {
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_random_test")]);
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 0);
+}
+
+#[test]
 fn test_recursive_clock() {
     let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")]);
     assert!(res.is_ok());
