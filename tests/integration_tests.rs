@@ -97,3 +97,9 @@ fn test_resume_interface() {
         }
     }
 }
+#[test]
+fn test_thread_clock() {
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_thread_clock_test")], 1000);
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 0);
+}
