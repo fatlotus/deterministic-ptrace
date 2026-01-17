@@ -2,7 +2,7 @@ use libc::{c_void, iovec, NT_PRSTATUS};
 use std::io::{self, Write};
 use std::ptr;
 use std::time::{SystemTime, Duration, UNIX_EPOCH};
-use crate::syscalls::{SandboxedProcess, SandboxState, read_child_string, write_child_memory, print_escaped};
+use crate::sandbox::{SandboxedProcess, SandboxState, read_child_string, write_child_memory, print_escaped};
 use crate::vdso::disable_vdso;
 
 const AARCH64_SYS_WRITE: u64 = 64;
