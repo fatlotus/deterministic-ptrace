@@ -210,15 +210,25 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 
                 write_child_memory(child, timespec_ptr, &timespec_data);
 
+                // Set return value to 0
+                regs[0] = 0;
+                let iov_regs = iovec {
+                    iov_base: regs.as_ptr() as *mut c_void,
+                    iov_len: std::mem::size_of_val(&regs),
+                };
+                unsafe {
+                    libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov_regs as *const iovec);
+                }
+
                 // Skip the syscall on ARM64 by setting syscall number to -1
                 let mut nr: i32 = -1;
-                let mut iov_nr = iovec {
+               let iov_nr = iovec {
                     iov_base: &mut nr as *mut i32 as *mut c_void,
                     iov_len: std::mem::size_of_val(&nr),
                 };
-                let _res = unsafe {
-                    libc::ptrace(libc::PTRACE_SETREGSET, child, 0x404 as *mut c_void, &mut iov_nr as *mut iovec)
-                };
+                unsafe {
+                    libc::ptrace(libc::PTRACE_SETREGSET, child, 0x404 as *mut c_void, &iov_nr as *const iovec);
+                }
             }
 
             if syscall_nr == AARCH64_SYS_NANOSLEEP || syscall_nr == AARCH64_SYS_CLOCK_NANOSLEEP {
@@ -246,6 +256,38 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 return Ok(Some(SandboxState::Pause(new_now)));
             }
 
+            if syscall_nr == 278 { // getrandom
+                let buf_ptr = regs[0];
+                let buf_len = regs[1];
+                let _flags = regs[2];
+
+                let mut data = Vec::with_capacity(buf_len as usize);
+                for i in 0..buf_len {
+                    data.push(i as u8);
+                }
+                write_child_memory(child, buf_ptr, &data);
+
+                // Set return value to bytes written
+                regs[0] = buf_len;
+                let iov_regs = iovec {
+                    iov_base: regs.as_ptr() as *mut c_void,
+                    iov_len: std::mem::size_of_val(&regs),
+                };
+                unsafe {
+                    libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov_regs as *const iovec);
+                }
+
+                // Skip the syscall: set syscall number to -1
+                let mut nr: i32 = -1;
+                let iov_nr = iovec {
+                    iov_base: &mut nr as *mut i32 as *mut c_void,
+                    iov_len: std::mem::size_of_val(&nr),
+                };
+                unsafe {
+                    libc::ptrace(libc::PTRACE_SETREGSET, child, 0x404 as *mut c_void, &iov_nr as *const iovec);
+                }
+            }
+
             if syscall_nr == AARCH64_SYS_WAIT4 {
                 return Ok(Some(SandboxState::WaitForSubprocess));
             }
@@ -261,8 +303,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
         let res_nr = unsafe { libc::ptrace(libc::PTRACE_GETREGSET, child, 0x404 as *mut c_void, &mut iov_nr as *mut iovec) };
 
         if res_nr == 0 && nr == -1 {
-            // ... (rest of skip handling) ...
-            // Skipping rest of this for now as it's already there
+            // Already handled at entry
         } else {
             // nr is the original syscall number
             let syscall_nr = nr as u64;
