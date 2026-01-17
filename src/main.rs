@@ -9,7 +9,7 @@ fn main() -> io::Result<()> {
         vec!["./hello"]
     };
 
-    match run_sandbox(&target_args) {
+    match run_sandbox(&target_args, 1000000) {
         Ok(code) => {
             if code == -1 {
                 std::process::exit(1);

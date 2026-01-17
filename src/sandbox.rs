@@ -86,6 +86,7 @@ pub struct SandboxedProcess {
     child_pid: i32,
     is_entry: bool,
     needs_resume: bool,
+    skipped_return_value: Option<u64>,
 }
 
 impl SandboxedProcess {
@@ -122,6 +123,7 @@ impl SandboxedProcess {
                     child_pid: child,
                     is_entry: true,
                     needs_resume: true,
+                    skipped_return_value: None,
                 })
             } else {
                 Err(io::Error::last_os_error())
@@ -144,6 +146,7 @@ impl SandboxedProcess {
             child_pid: pid,
             is_entry: true,
             needs_resume: true,
+            skipped_return_value: None,
         }
     }
 
@@ -186,6 +189,14 @@ impl SandboxedProcess {
 
     pub fn set_is_entry(&mut self, is_entry: bool) {
         self.is_entry = is_entry;
+    }
+
+    pub fn set_skipped_return_value(&mut self, val: Option<u64>) {
+        self.skipped_return_value = val;
+    }
+
+    pub fn skipped_return_value(&self) -> Option<u64> {
+        self.skipped_return_value
     }
 
     pub fn handle_event(&mut self, status: c_int, now: SystemTime) -> io::Result<Option<SandboxState>> {

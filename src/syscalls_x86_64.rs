@@ -11,6 +11,9 @@ const X86_64_SYS_NANOSLEEP: u64 = 35;
 const X86_64_SYS_CLOCK_GETTIME: u64 = 228;
 const X86_64_SYS_CLOCK_NANOSLEEP: u64 = 230;
 const X86_64_SYS_EXECVE: u64 = 59;
+const X86_64_SYS_GETRANDOM: u64 = 318;
+const X86_64_SYS_WAITID: u64 = 247;
+const X86_64_SYS_WAIT4: u64 = 61;
 
 pub fn syscall_name(nr: u64) -> &'static str {
     match nr {
@@ -98,6 +101,7 @@ pub fn syscall_name(nr: u64) -> &'static str {
         88 => "symlink",
         266 => "symlinkat",
         89 => "readlink",
+        247 => "waitid",
         _ => "unknown",
     }
 }
@@ -156,6 +160,7 @@ pub fn is_allowed(nr: u64) -> bool {
             | 332
             | 201
             | 41 | 42 | 43 | 54 | 55 | 110 | 102 | 104 | 107 | 108 | 105 | 106 | 217 | 78 | 32 | 33 | 292 | 22 | 293 | 77 | 92 | 93 | 90 | 91 | 80 | 81 | 85 | 86 | 265 | 88 | 266 | 89
+            | 247
     )
 }
 
@@ -267,8 +272,32 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                     return Ok(Some(SandboxState::Pause(new_now)));
                 }
 
-                if syscall_nr == 61 { // wait4
-                    println!("[container] wait4 interception, yielding");
+                if syscall_nr == X86_64_SYS_GETRANDOM {
+                    let buf_ptr = regs[14];
+                    let buf_len = regs[13];
+                    println!("[container] getrandom(buf_ptr={:x}, buf_len={})", buf_ptr, buf_len);
+                    
+                    let mut data = Vec::with_capacity(buf_len as usize);
+                    for i in 0..buf_len {
+                        data.push(i as u8);
+                    }
+                    write_child_memory(child, buf_ptr, &data);
+                    
+                    proc.set_skipped_return_value(Some(buf_len));
+                    
+                    // Skip the syscall
+                    regs[15] = 0xFFFFFFFFFFFFFFFF;
+                    let iov = iovec {
+                        iov_base: regs.as_mut_ptr() as *mut c_void,
+                        iov_len: std::mem::size_of_val(&regs),
+                    };
+                    unsafe {
+                        libc::ptrace(libc::PTRACE_SETREGSET, child, NT_PRSTATUS as *mut c_void, &iov as *const iovec);
+                    }
+                }
+
+                if syscall_nr == X86_64_SYS_WAIT4 || syscall_nr == X86_64_SYS_WAITID {
+                    println!("[container] wait interception, yielding");
                     return Ok(Some(SandboxState::WaitForSubprocess));
                 }
             }
@@ -285,7 +314,10 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
         if res == 0 {
             let syscall_nr = regs[15];
             if syscall_nr == 0xFFFFFFFFFFFFFFFF {
-                regs[10] = 0; // Success
+                let ret_val = proc.skipped_return_value().unwrap_or(0);
+                regs[10] = ret_val;
+                proc.set_skipped_return_value(None);
+                
                 let iov = iovec {
                     iov_base: regs.as_mut_ptr() as *mut c_void,
                     iov_len: std::mem::size_of_val(&regs),

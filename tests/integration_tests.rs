@@ -4,41 +4,41 @@ use std::time::Duration;
 
 #[test]
 fn test_happy_case() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_printf_success")]);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_printf_success")], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_sad_case() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_mkdir_fail")]);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_mkdir_fail")], 1000);
     assert!(!res.is_ok());
 }
 
 #[test]
 fn test_clock_redirection() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_clock_test")]);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_clock_test")], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_random_determinism() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_random_test")]);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_random_test")], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_recursive_clock() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")]);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_python_hello_world() {
-    let res = run_sandbox(&["/usr/bin/python3", "-c", "print('hello world')"]);
+    let res = run_sandbox(&["/usr/bin/python3", "-c", "print('hello world')"], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
@@ -49,7 +49,7 @@ fn test_python_random_determinism() {
         "/usr/bin/python3",
         "-c",
         "import random; assert(random.randint(0, 10000) == 4046)",
-    ]);
+    ], 1000);
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }

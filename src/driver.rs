@@ -29,7 +29,7 @@ impl Ord for SleepingProcess {
     }
 }
 
-pub fn run_sandbox(args: &[&str]) -> io::Result<i32> {
+pub fn run_sandbox(args: &[&str], max_steps: usize) -> io::Result<i32> {
     let mut runnable: VecDeque<SandboxedProcess> = VecDeque::new();
     let mut sleeping: BinaryHeap<SleepingProcess> = BinaryHeap::new();
     let mut waiting: Vec<SandboxedProcess> = Vec::new();
@@ -39,6 +39,7 @@ pub fn run_sandbox(args: &[&str]) -> io::Result<i32> {
 
     let mut now = std::time::UNIX_EPOCH + std::time::Duration::from_secs(123456789);
 
+    let mut steps = 0;
     while !runnable.is_empty() || !sleeping.is_empty() || !waiting.is_empty() {
         if runnable.is_empty() && !sleeping.is_empty() {
             // Advance time to the next sleeping process
@@ -68,6 +69,7 @@ pub fn run_sandbox(args: &[&str]) -> io::Result<i32> {
 
         match result {
             Ok(SandboxState::Exit(code)) => {
+                steps += 1;
                 println!("[driver] Process {} exited with code {}", pid, code);
                 for p in waiting.drain(..) {
                     runnable.push_back(p);
@@ -77,22 +79,31 @@ pub fn run_sandbox(args: &[&str]) -> io::Result<i32> {
                 }
             }
             Ok(SandboxState::NewChild(new_proc)) => {
+                steps += 1;
                 println!("[driver] Spawning a new process {}", new_proc.pid());
                 runnable.push_back(new_proc);
                 runnable.push_back(next);
             }
             Ok(SandboxState::Pause(new_now)) => {
+                steps += 1;
                 sleeping.push(SleepingProcess { time: new_now, process: next });
             }
             Ok(SandboxState::SchedYield) => {
                 runnable.push_back(next);
             }
             Ok(SandboxState::WaitForSubprocess) => {
+                steps += 1;
                 waiting.push(next);
             }
             Err(e) => {
+                println!("[driver] Error in run_sandbox: {}", e);
                 return Err(e);
             }
+        }
+
+        if steps > max_steps {
+            println!("[driver] Maximum steps ({}) exceeded", max_steps);
+            return Err(io::Error::new(io::ErrorKind::TimedOut, "Maximum steps exceeded"));
         }
     }
     Ok(0)
