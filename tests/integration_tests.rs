@@ -1,4 +1,4 @@
-use rust_container::{run_sandbox, sandbox};
+use rust_container::{run_sandbox, SandboxedProcess, SandboxState};
 use std::thread;
 use std::time::Duration;
 
@@ -40,7 +40,7 @@ fn test_python_hello_world() {
 fn test_process_cleanup() {
     let pid;
     {
-        let proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_clock_test")]).unwrap();
+        let proc = SandboxedProcess::new(&[env!("CARGO_BIN_EXE_clock_test")]).unwrap();
         pid = proc.pid();
         // Verify process exists
         assert_eq!(unsafe { libc::kill(pid, 0) }, 0);
@@ -60,20 +60,20 @@ fn test_process_cleanup() {
 
 #[test]
 fn test_resume_interface() {
-    let mut proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_printf_success")]).unwrap();
+    let mut proc = SandboxedProcess::new(&[env!("CARGO_BIN_EXE_printf_success")]).unwrap();
     loop {
         match proc.resume(std::time::UNIX_EPOCH) {
-            Ok(sandbox::SandboxState::SchedYield) => continue,
-            Ok(sandbox::SandboxState::Exit(0)) => break,
+            Ok(SandboxState::SchedYield) => continue,
+            Ok(SandboxState::Exit(0)) => break,
             Ok(state) => panic!("Expected Exit(0), got {:?}", state),
             Err(e) => panic!("Expected Exit(0), got {:?}", e),
         }
     }
 
-    let mut proc = sandbox::SandboxedProcess::new(&[env!("CARGO_BIN_EXE_mkdir_fail")]).unwrap();
+    let mut proc = SandboxedProcess::new(&[env!("CARGO_BIN_EXE_mkdir_fail")]).unwrap();
     loop {
         match proc.resume(std::time::UNIX_EPOCH) {
-            Ok(sandbox::SandboxState::SchedYield) => continue,
+            Ok(SandboxState::SchedYield) => continue,
             Err(_) => break, // Expected error for forbidden syscall
             Ok(state) => panic!("Expected error, got {:?}", state),
         }

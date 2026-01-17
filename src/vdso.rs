@@ -1,56 +1,54 @@
-use libc::{c_void, iovec, NT_PRSTATUS};
+use libc::c_void;
 use std::ptr;
+use std::io;
 
-pub fn disable_vdso(child: i32) {
-    let mut regs = [0u64; 64];
-    let mut iov = iovec {
-        iov_base: regs.as_mut_ptr() as *mut c_void,
-        iov_len: std::mem::size_of_val(&regs),
-    };
-
+pub fn disable_vdso(child: i32, sp: u64) {
     unsafe {
-        let res = libc::ptrace(
-            libc::PTRACE_GETREGSET,
-            child,
-            NT_PRSTATUS as *mut c_void,
-            &mut iov as *mut iovec,
-        );
-
-        if res != 0 {
+        let mut addr = sp;
+        let argc_res = libc::ptrace(libc::PTRACE_PEEKDATA, child, addr as *mut c_void, ptr::null_mut::<c_void>());
+        if argc_res == -1 {
+            let err = io::Error::last_os_error();
+            println!("[vdso] Failed to read argc from sp {:x}: {:?}", sp, err);
             return;
         }
-
-        let sp = regs[19];
-        let mut addr = sp;
-        let argc = libc::ptrace(libc::PTRACE_PEEKDATA, child, addr as *mut c_void, ptr::null_mut::<c_void>()) as u64;
+        let argc = argc_res as u64;
+        println!("[vdso] sp={:x}, argc={}", sp, argc);
         addr += 8; // skip argc
         addr += (argc + 1) * 8; // skip argv and NULL
         
-        // skip envp
+        // Skip envp
         loop {
-            let env_ptr = libc::ptrace(libc::PTRACE_PEEKDATA, child, addr as *mut c_void, ptr::null_mut::<c_void>()) as u64;
+            let val = libc::ptrace(libc::PTRACE_PEEKDATA, child, addr as *mut c_void, ptr::null_mut::<c_void>());
+            if val == 0 { 
+                addr += 8;
+                break; 
+            }
+            if val == -1 {
+                let err = io::Error::last_os_error();
+                if err.raw_os_error() != Some(0) {
+                    println!("[vdso] Error reading envp at {:x}: {:?}", addr, err);
+                    return;
+                }
+                addr += 8;
+                break;
+            }
             addr += 8;
-            if env_ptr == 0 {
-                break;
-            }
         }
-        
-        // Now we are at auxv
+
         let mut vdso_addr = 0u64;
-        let mut auxv_addr = addr;
+        println!("[vdso] Searching auxv at {:x}", addr);
         loop {
-            let a_type = libc::ptrace(libc::PTRACE_PEEKDATA, child, auxv_addr as *mut c_void, ptr::null_mut::<c_void>()) as u64;
-            let a_val = libc::ptrace(libc::PTRACE_PEEKDATA, child, (auxv_addr + 8) as *mut c_void, ptr::null_mut::<c_void>()) as u64;
-            if a_type == 0 { // AT_NULL
+            let key = libc::ptrace(libc::PTRACE_PEEKDATA, child, addr as *mut c_void, ptr::null_mut::<c_void>());
+            if key == 0 || key == -1 { break; }
+            let val = libc::ptrace(libc::PTRACE_PEEKDATA, child, (addr + 8) as *mut c_void, ptr::null_mut::<c_void>()) as u64;
+            
+            if key == 33 { // AT_SYSINFO_EHDR
+                vdso_addr = val;
+                libc::ptrace(libc::PTRACE_POKEDATA, child, (addr + 8) as *mut c_void, 0); 
+                println!("[vdso] Found and zeroed AT_SYSINFO_EHDR (33) value at {:x}, original value={:x}", addr + 8, val);
                 break;
             }
-            if a_type == 33 { // AT_SYSINFO_EHDR
-                vdso_addr = a_val;
-                eprintln!("[debug] Found VDSO at {:x} (auxv addr {:x})", vdso_addr, auxv_addr);
-                // Zero out AT_SYSINFO_EHDR value
-                libc::ptrace(libc::PTRACE_POKEDATA, child, (auxv_addr + 8) as *mut c_void, 0 as *mut c_void);
-            }
-            auxv_addr += 16;
+            addr += 16;
         }
 
         if vdso_addr != 0 {

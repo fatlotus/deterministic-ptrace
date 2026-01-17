@@ -1,5 +1,5 @@
 use std::io;
-use crate::sandbox::{SandboxedProcess, SandboxState};
+use crate::syscalls::{SandboxedProcess, SandboxState};
 use std::collections::{VecDeque, BinaryHeap};
 use std::cmp::Ordering;
 
