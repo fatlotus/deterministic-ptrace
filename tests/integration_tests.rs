@@ -44,6 +44,17 @@ fn test_python_hello_world() {
 }
 
 #[test]
+fn test_python_random_determinism() {
+    let res = run_sandbox(&[
+        "/usr/bin/python3",
+        "-c",
+        "import random; assert(random.randint(0, 10000) == 4046)",
+    ]);
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 0);
+}
+
+#[test]
 fn test_process_cleanup() {
     let pid;
     {
