@@ -5,6 +5,13 @@ use std::ptr;
 use crate::vdso::disable_vdso;
 use std::time::SystemTime;
 use crate::arch;
+use syscalls::Sysno;
+
+#[derive(Debug, Clone)]
+pub struct SyscallArgs {
+    pub sysno: Option<Sysno>,
+    pub args: [u64; 6],
+}
 
 // Architecture-dependent syscall details relocated to arch module.
 
@@ -219,11 +226,101 @@ impl SandboxedProcess {
         }
 
         if libc::WIFSTOPPED(status) && libc::WSTOPSIG(status) == (SIGTRAP | 0x80) {
-            let res = arch::handle_syscall_event(self, now)?;
+            let res = self.handle_syscall_event(now)?;
             self.is_entry = !self.is_entry;
             return Ok(res);
         }
 
+        Ok(None)
+    }
+
+    fn handle_syscall_event(&mut self, now: SystemTime) -> io::Result<Option<SandboxState>> {
+        let child = self.child_pid;
+        let is_entry = self.is_entry;
+
+        if is_entry {
+            let args = arch::get_syscall_args(child)?;
+            let Some(sysno) = args.sysno else {
+                return Ok(None);
+            };
+
+            if !arch::is_allowed(sysno) {
+                eprintln!("[container] FORBIDDEN syscall: {} ({}). Killing child.", sysno.id(), sysno.name());
+                unsafe {
+                    libc::ptrace(libc::PTRACE_KILL, child, ptr::null_mut::<c_void>(), ptr::null_mut::<c_void>());
+                }
+                return Err(io::Error::new(io::ErrorKind::InvalidData, "Forbidden syscall"));
+            }
+
+            match sysno {
+                Sysno::clock_gettime => {
+                    let _clk_id = args.args[0];
+                    let timespec_ptr = args.args[1];
+                    
+                    let since_epoch = now.duration_since(std::time::UNIX_EPOCH).unwrap();
+                    let seconds = since_epoch.as_secs();
+                    let nanoseconds = since_epoch.subsec_nanos() as i64;
+
+                    let mut timespec_data = [0u8; 16];
+                    timespec_data[0..8].copy_from_slice(&seconds.to_le_bytes());
+                    timespec_data[8..16].copy_from_slice(&nanoseconds.to_le_bytes());
+                    
+                    write_child_memory(child, timespec_ptr, &timespec_data);
+                    arch::skip_syscall(child, 0)?;
+                }
+                Sysno::nanosleep | Sysno::clock_nanosleep => {
+                    let req_ptr = if sysno == Sysno::nanosleep {
+                        args.args[0]
+                    } else {
+                        args.args[2]
+                    };
+                    
+                    let tv_sec = unsafe { libc::ptrace(libc::PTRACE_PEEKDATA, child, req_ptr as *mut c_void, ptr::null_mut::<c_void>()) as u64 };
+                    let tv_nsec = unsafe { libc::ptrace(libc::PTRACE_PEEKDATA, child, (req_ptr + 8) as *mut c_void, ptr::null_mut::<c_void>()) as u64 };
+                    
+                    let new_now = now + std::time::Duration::from_secs(tv_sec) + std::time::Duration::from_nanos(tv_nsec);
+
+                    arch::skip_syscall(child, 0)?;
+                    return Ok(Some(SandboxState::Pause(new_now)));
+                }
+                Sysno::getrandom => {
+                    let buf_ptr = args.args[0];
+                    let buf_len = args.args[1];
+
+                    let mut data = Vec::with_capacity(buf_len as usize);
+                    for i in 0..buf_len {
+                        data.push(i as u8);
+                    }
+                    write_child_memory(child, buf_ptr, &data);
+
+                    arch::skip_syscall(child, buf_len)?;
+                }
+                Sysno::wait4 | Sysno::waitid => {
+                    return Ok(Some(SandboxState::WaitForSubprocess));
+                }
+                Sysno::write => {
+                    let fd = args.args[0] as i32;
+                    let addr = args.args[1];
+                    let len = args.args[2];
+
+                    if fd >= 0 && fd <= 2 && len > 0 && len < 1000000 {
+                        print_escaped(child, addr, if len > 128 { 128 } else { len });
+                        let _s = read_child_string(child, addr, len as usize);
+                    }
+                }
+                _ => {}
+            }
+        } else {
+            let args = arch::get_syscall_args(child)?;
+            let ret = arch::get_syscall_ret(child)?;
+
+            if let Some(sysno) = args.sysno {
+                if (sysno == Sysno::execve || sysno == Sysno::execveat) && ret == 0 {
+                    let sp = arch::get_sp(child)?;
+                    disable_vdso(child, sp);
+                }
+            }
+        }
         Ok(None)
     }
 }
