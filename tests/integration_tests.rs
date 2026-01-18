@@ -103,3 +103,9 @@ fn test_thread_clock() {
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
+#[test]
+fn test_bash_script() {
+    let res = run_sandbox(&["/bin/bash", "test_dir/test_script.sh"], 1000);
+    assert!(res.is_ok());
+    assert_eq!(res.unwrap(), 0);
+}

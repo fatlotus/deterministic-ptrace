@@ -21,14 +21,14 @@ pub fn is_allowed(sysno: Sysno) -> bool {
             | Sysno::prlimit64 | Sysno::getpid | Sysno::gettid | Sysno::sysinfo | Sysno::futex
             | Sysno::munmap | Sysno::brk | Sysno::access | Sysno::arch_prctl | Sysno::rseq
             | Sysno::execve | Sysno::mmap | Sysno::mprotect | Sysno::prctl | Sysno::getrandom
-            | Sysno::memfd_create | Sysno::clone3 | Sysno::wait4 | Sysno::statx | Sysno::time
+            | Sysno::memfd_create | Sysno::clone | Sysno::clone3 | Sysno::wait4 | Sysno::statx | Sysno::time
             | Sysno::socket | Sysno::connect | Sysno::accept | Sysno::setsockopt | Sysno::getsockopt
             | Sysno::getppid | Sysno::getuid | Sysno::getgid | Sysno::geteuid | Sysno::getegid
             | Sysno::setuid | Sysno::setgid | Sysno::getdents64 | Sysno::getdents | Sysno::dup
             | Sysno::dup2 | Sysno::dup3 | Sysno::pipe | Sysno::pipe2 | Sysno::ftruncate
             | Sysno::chown | Sysno::fchown | Sysno::chmod | Sysno::fchmod | Sysno::chdir
             | Sysno::fchdir | Sysno::creat | Sysno::link | Sysno::linkat | Sysno::symlink
-            | Sysno::symlinkat| Sysno::readlink | Sysno::madvise | Sysno::exit | Sysno::waitid
+            | Sysno::symlinkat| Sysno::readlink | Sysno::madvise | Sysno::exit | Sysno::waitid | Sysno::gettimeofday | Sysno::getpgid | Sysno::getpgrp
     )
 }
 

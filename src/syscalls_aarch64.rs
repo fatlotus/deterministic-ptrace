@@ -29,7 +29,7 @@ pub fn is_allowed(sysno: Sysno) -> bool {
             | Sysno::dup | Sysno::dup3 | Sysno::pipe2 | Sysno::ftruncate
             | Sysno::fchmod | Sysno::fchown | Sysno::socket | Sysno::connect 
             | Sysno::accept | Sysno::setsockopt | Sysno::getsockopt | Sysno::rseq
-            | Sysno::gettimeofday | Sysno::madvise | Sysno::exit
+            | Sysno::gettimeofday | Sysno::madvise | Sysno::exit | Sysno::getpgid | Sysno::chdir
     )
 }
 
