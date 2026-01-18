@@ -5,147 +5,37 @@ use std::time::{SystemTime, Duration, UNIX_EPOCH};
 use crate::sandbox::{SandboxedProcess, SandboxState, read_child_string, write_child_memory, print_escaped};
 use crate::vdso::disable_vdso;
 
-const AARCH64_SYS_WRITE: u64 = 64;
-const AARCH64_SYS_OPENAT: u64 = 56;
-const AARCH64_SYS_NANOSLEEP: u64 = 101;
-const AARCH64_SYS_CLOCK_GETTIME: u64 = 113;
-const AARCH64_SYS_CLOCK_NANOSLEEP: u64 = 115;
-const AARCH64_SYS_EXECVE: u64 = 221;
-const AARCH64_SYS_WAIT4: u64 = 260;
+use syscalls::Sysno;
 
 pub fn syscall_name(nr: u64) -> &'static str {
-    match nr {
-        17 => "getcwd",
-        25 => "fcntl",
-        29 => "ioctl",
-        34 => "mkdirat",
-        43 => "fstatfs",
-        48 => "faccessat",
-        56 => "openat",
-        57 => "close",
-        62 => "lseek",
-        63 => "read",
-        64 => "write",
-        67 => "pread64",
-        73 => "ppoll",
-        78 => "readlinkat",
-        79 => "newfstatat",
-        80 => "fstat",
-        94 => "exit_group",
-        96 => "set_tid_address",
-        99 => "set_robust_list",
-        101 => "nanosleep",
-        113 => "clock_gettime",
-        115 => "clock_nanosleep",
-        123 => "sched_getaffinity",
-        131 => "tgkill",
-        132 => "sigaltstack",
-        134 => "rt_sigaction",
-        135 => "rt_sigprocmask",
-        139 => "rt_sigreturn",
-        160 => "uname",
-        163 => "getrlimit",
-        161 => "prlimit64",
-        172 => "getpid",
-        178 => "gettid",
-        179 => "sysinfo",
-        98 => "futex",
-        215 => "munmap",
-        214 => "brk",
-        221 => "execve",
-        281 => "execveat",
-        222 => "mmap",
-        226 => "mprotect",
-        66 => "writev",
-        65 => "readv",
-        220 => "clone",
-        167 => "prctl",
-        278 => "getrandom",
-        279 => "memfd_create",
-        435 => "clone3",
-        260 => "wait4",
-        291 => "statx",
-        173 => "getppid",
-        174 => "getuid",
-        176 => "getgid",
-        175 => "geteuid",
-        177 => "getegid",
-        147 => "setuid",
-        144 => "setgid",
-        61 => "getdents64",
-        23 => "dup",
-        24 => "dup3",
-        59 => "pipe2",
-        72 => "ftruncate",
-        52 => "fchmod",
-        49 => "fchown",
-        198 => "socket",
-        203 => "connect",
-        202 => "accept",
-        208 => "setsockopt",
-        209 => "getsockopt",
-        293 => "rseq",
-        261 => "prlimit64",
-        169 => "gettimeofday",
-        233 => "madvise",
-        93 => "exit",
-        _ => "unknown",
-    }
+    Sysno::new(nr as usize).map(|s| s.name()).unwrap_or("unknown")
 }
 
 pub fn is_allowed(nr: u64) -> bool {
+    let Some(sysno) = Sysno::new(nr as usize) else { return false };
+    
+    // Using a matches! block with Sysno variants for clarity/efficiency
     matches!(
-        nr,
-        17 | 25
-            | 29
-//          | 34 // mkdirat - forbidden for tests
-            | 43
-            | 48
-            | 56
-            | 57
-            | 62
-            | 63
-            | 64
-            | 65
-            | 66
-            | 67
-            | 73
-            | 78
-            | 79
-            | 80
-            | 94
-            | 96
-            | 99
-            | 101
-            | 113
-            | 115
-            | 123
-            | 131
-            | 132
-            | 134
-            | 135
-            | 139
-            | 160
-            | 163
-            | 161
-            | 171
-            | 172
-            | 178
-            | 179
-            | 98
-            | 215
-            | 214
-            | 220
-            | 221
-            | 281
-            | 222
-            | 226
-            | 167
-            | 278
-            | 279
-            | 435
-            | 260
-            | 0 | 291 | 173 | 174 | 176 | 175 | 177 | 147 | 144 | 61 | 23 | 24 | 59 | 72 | 52 | 49 | 198 | 203 | 202 | 208 | 209 | 261 | 293 | 169 | 233 | 93
+        sysno,
+        Sysno::getcwd | Sysno::fcntl | Sysno::ioctl | Sysno::fstatfs
+            | Sysno::faccessat | Sysno::openat | Sysno::close | Sysno::lseek
+            | Sysno::read | Sysno::write | Sysno::readv | Sysno::writev | Sysno::pread64 
+            | Sysno::ppoll | Sysno::readlinkat | Sysno::fstatat | Sysno::fstat 
+            | Sysno::exit_group | Sysno::set_tid_address | Sysno::set_robust_list 
+            | Sysno::nanosleep | Sysno::clock_gettime | Sysno::clock_nanosleep
+            | Sysno::sched_getaffinity | Sysno::tgkill | Sysno::sigaltstack 
+            | Sysno::rt_sigaction | Sysno::rt_sigprocmask | Sysno::rt_sigreturn 
+            | Sysno::uname | Sysno::getrlimit | Sysno::prlimit64 | Sysno::getpid 
+            | Sysno::gettid | Sysno::sysinfo | Sysno::futex | Sysno::munmap 
+            | Sysno::brk | Sysno::clone | Sysno::execve | Sysno::execveat 
+            | Sysno::mmap | Sysno::mprotect | Sysno::prctl | Sysno::getrandom
+            | Sysno::memfd_create | Sysno::clone3 | Sysno::wait4 | Sysno::statx 
+            | Sysno::getppid | Sysno::getuid | Sysno::getgid | Sysno::geteuid 
+            | Sysno::getegid | Sysno::setuid | Sysno::setgid | Sysno::getdents64 
+            | Sysno::dup | Sysno::dup3 | Sysno::pipe2 | Sysno::ftruncate
+            | Sysno::fchmod | Sysno::fchown | Sysno::socket | Sysno::connect 
+            | Sysno::accept | Sysno::setsockopt | Sysno::getsockopt | Sysno::rseq
+            | Sysno::gettimeofday | Sysno::madvise | Sysno::exit
     )
 }
 
@@ -173,7 +63,8 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
             // ARM64: x8 is regs[8], syscall number
             // Arguments: x0..x5 => regs[0..6]
             let syscall_nr = regs[8];
-            let name = syscall_name(syscall_nr);
+            let sysno = Sysno::new(syscall_nr as usize);
+            let name = sysno.map(|s| s.name()).unwrap_or("unknown");
 
             if !is_allowed(syscall_nr) {
                 eprintln!("[container] FORBIDDEN syscall: {} ({}). Killing child.", syscall_nr, name);
@@ -183,11 +74,11 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 return Err(io::Error::new(io::ErrorKind::InvalidData, "Forbidden syscall"));
             }
 
-            if syscall_nr == AARCH64_SYS_OPENAT {
+            if sysno == Some(Sysno::openat) {
                 let _path = read_child_string(child, regs[1], 4096);
             }
 
-            if syscall_nr == AARCH64_SYS_WRITE {
+            if sysno == Some(Sysno::write) {
                 let fd = regs[0] as i32;
                 let addr = regs[1];
                 let len = regs[2];
@@ -198,7 +89,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 }
             }
 
-            if syscall_nr == AARCH64_SYS_CLOCK_GETTIME {
+            if sysno == Some(Sysno::clock_gettime) {
                 let _clk_id = regs[0];
                 let timespec_ptr = regs[1];
                 
@@ -233,8 +124,8 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 }
             }
 
-            if syscall_nr == AARCH64_SYS_NANOSLEEP || syscall_nr == AARCH64_SYS_CLOCK_NANOSLEEP {
-                let (req_ptr, _rem_ptr) = if syscall_nr == AARCH64_SYS_NANOSLEEP {
+            if sysno == Some(Sysno::nanosleep) || sysno == Some(Sysno::clock_nanosleep) {
+                let (req_ptr, _rem_ptr) = if sysno == Some(Sysno::nanosleep) {
                     (regs[0], regs[1])
                 } else {
                     (regs[2], regs[3])
@@ -258,7 +149,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 return Ok(Some(SandboxState::Pause(new_now)));
             }
 
-            if syscall_nr == 278 { // getrandom
+            if sysno == Some(Sysno::getrandom) { // getrandom
                 let buf_ptr = regs[0];
                 let buf_len = regs[1];
                 let _flags = regs[2];
@@ -290,7 +181,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
                 }
             }
 
-            if syscall_nr == AARCH64_SYS_WAIT4 {
+            if sysno == Some(Sysno::wait4) {
                 return Ok(Some(SandboxState::WaitForSubprocess));
             }
         }
@@ -309,6 +200,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
         } else {
             // nr is the original syscall number
             let syscall_nr = nr as u64;
+            let sysno_exit = Sysno::new(syscall_nr as usize);
             let mut regs = [0u64; 64];
             let mut iov = iovec {
                 iov_base: regs.as_mut_ptr() as *mut c_void,
@@ -317,7 +209,7 @@ pub fn handle_syscall_event(proc: &mut SandboxedProcess, now: SystemTime) -> io:
             let res = unsafe { libc::ptrace(libc::PTRACE_GETREGSET, child, NT_PRSTATUS as *mut c_void, &mut iov as *mut iovec) };
             if res == 0 {
                 let ret = regs[0];
-                if (syscall_nr == AARCH64_SYS_EXECVE || syscall_nr == 281) && ret == 0 {
+                if (sysno_exit == Some(Sysno::execve) || sysno_exit == Some(Sysno::execveat)) && ret == 0 {
                     let sp = get_sp(child)?;
                     disable_vdso(child, sp);
                 }
