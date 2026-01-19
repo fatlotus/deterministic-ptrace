@@ -59,6 +59,22 @@ cargo test
 
 These tests verify basic functionality like successful execution and correct handling of forbidden syscalls.
 
+### Local CI Testing with `act`
+
+You can verify the GitHub Actions workflow locally using the [act](https://github.com/nektos/act) tool.
+
+To run the ARM64 tests on a Mac (ARM64):
+```bash
+act -j test --matrix arch:arm64 --matrix os:ubuntu-24.04-arm64 -P ubuntu-24.04-arm64=catthehacker/ubuntu:act-latest --container-options "--privileged"
+```
+
+#### ⚠️ Rosetta and Emulation Caveat
+When running `act` on a Mac, you may encounter issues trying to run the `x86_64` matrix job if you are on an Apple Silicon (M-series) Mac.
+
+- **ARM64**: Works natively and reliably since the container architecture matches the host.
+- **x86_64**: Running `x86_64` containers via Rosetta/QEMU emulation on an ARM Mac does **not** support the `ptrace` features required by this sandbox. You will see test failures (like "Time mismatch" or "Sandbox failed") because the emulation layer does not accurately replicate the ptrace behavior for multi-arch scenarios.
+- **Verification**: To properly verify x86_64 changes, use a native x86_64 environment (like a Linux VM or the provided QEMU environment) rather than `act` emulation.
+
 ### Clock Mocking Test
 
 To verify the deterministic clock mocking:
