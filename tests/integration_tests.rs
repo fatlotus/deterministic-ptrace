@@ -4,41 +4,41 @@ use std::time::Duration;
 
 #[test]
 fn test_happy_case() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_printf_success")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_printf_success")], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_sad_case() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_mkdir_fail")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_mkdir_fail")], 1000, Some(Duration::from_secs(1)));
     assert!(!res.is_ok());
 }
 
 #[test]
 fn test_clock_redirection() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_clock_test")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_clock_test")], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_random_determinism() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_random_test")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_random_test")], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_recursive_clock() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_recursive_clock_test")], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 
 #[test]
 fn test_python_hello_world() {
-    let res = run_sandbox(&["/usr/bin/python3", "-c", "print('hello world')"], 1000);
+    let res = run_sandbox(&["/usr/bin/python3", "-c", "print('hello world')"], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
@@ -49,7 +49,7 @@ fn test_python_random_determinism() {
         "/usr/bin/python3",
         "-c",
         "import random; assert(random.randint(0, 10000) == 4046)",
-    ], 1000);
+    ], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
@@ -99,13 +99,28 @@ fn test_resume_interface() {
 }
 #[test]
 fn test_thread_clock() {
-    let res = run_sandbox(&[env!("CARGO_BIN_EXE_thread_clock_test")], 1000);
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_thread_clock_test")], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
 }
 #[test]
 fn test_bash_script() {
-    let res = run_sandbox(&["/bin/bash", "test_dir/test_script.sh"], 1000);
+    let res = run_sandbox(&["/bin/bash", "test_dir/test_script.sh"], 1000, Some(Duration::from_secs(1)));
     assert!(res.is_ok());
     assert_eq!(res.unwrap(), 0);
+}
+
+#[test]
+#[should_panic(expected = "Real-time limit exceeded")]
+fn test_timeout_panic() {
+    // This command should take longer than 1 microsecond
+    let res = run_sandbox(&["/bin/ls"], 1000000, Some(Duration::from_micros(1)));
+    res.expect("Real-time limit exceeded");
+}
+
+#[test]
+#[should_panic(expected = "Real-time limit exceeded")]
+fn test_infinite_loop_timeout() {
+    let res = run_sandbox(&[env!("CARGO_BIN_EXE_infinite_loop")], 1000000, Some(Duration::from_millis(100)));
+    res.expect("Real-time limit exceeded");
 }

@@ -29,11 +29,12 @@ impl Ord for SleepingProcess {
     }
 }
 
-pub fn run_sandbox(args: &[&str], max_steps: usize) -> io::Result<i32> {
+pub fn run_sandbox(args: &[&str], max_steps: usize, real_time_limit: Option<std::time::Duration>) -> io::Result<i32> {
     let mut runnable: VecDeque<SandboxedProcess> = VecDeque::new();
     let mut sleeping: BinaryHeap<SleepingProcess> = BinaryHeap::new();
     let mut waiting: Vec<SandboxedProcess> = Vec::new();
 
+    let start_time = std::time::Instant::now();
     let initial = SandboxedProcess::new(args)?;
     runnable.push_back(initial);
 
@@ -42,6 +43,13 @@ pub fn run_sandbox(args: &[&str], max_steps: usize) -> io::Result<i32> {
     let mut steps = 0;
     let mut consecutive_yields = 0;
     while !runnable.is_empty() || !sleeping.is_empty() || !waiting.is_empty() {
+        if let Some(limit) = real_time_limit {
+            if start_time.elapsed() > limit {
+                println!("[driver] Real-time limit exceeded ({:?})", limit);
+                return Err(io::Error::new(io::ErrorKind::TimedOut, "Real-time limit exceeded"));
+            }
+        }
+
         if runnable.is_empty() && !sleeping.is_empty() {
             // Advance time to the next sleeping process
             let next_sleeping = sleeping.pop().unwrap();
@@ -114,9 +122,8 @@ pub fn run_sandbox(args: &[&str], max_steps: usize) -> io::Result<i32> {
                         consecutive_yields = 0;
                     } else if waiting.is_empty() {
                         // Everyone is yielding and nothing is sleeping and nothing is waiting... 
-                        // This might be a busy-wait or infinite yield. 
-                        // Give it some time or just break if we want to avoid infinite loops.
-                        // For now just keep going, but maybe it's a deadlock.
+                        // This is likely a busy-wait. Yield to the OS to avoid 100% CPU usage.
+                        std::thread::yield_now();
                     }
                 }
             }
